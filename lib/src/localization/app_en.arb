@@ -1,0 +1,6 @@
+{
+  "appTitle": "asamba_android",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}

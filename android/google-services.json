@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "31732078664",
+    "project_id": "asamba-6282d",
+    "storage_bucket": "asamba-6282d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:31732078664:android:09812b8e651e3acb97e07d",
+        "android_client_info": {
+          "package_name": "com.hariprd.asamba"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCB56N6TixdfBmrSzRGxMXsvCQmHi41nmc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
