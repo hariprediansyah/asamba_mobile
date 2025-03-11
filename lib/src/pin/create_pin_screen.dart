@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:asamba_android/src/app.dart';
+import 'package:asamba_android/utils/loading_overlay.dart';
 import 'package:asamba_android/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +19,7 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
   String savedPin = '';
   final TextEditingController _pinController = TextEditingController();
 
-  void _onPinCompleted(String pin) {
+  void _onPinCompleted(String pin) async {
     if (!_isConfirm) {
       savedPin = pin;
       _pinController.text = '';
@@ -26,7 +28,26 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
       });
     } else {
       if (pin == savedPin) {
-        Navigator.pushNamed(context, "/home");
+        // Navigator.pushNamed(context, "/home");
+        LoadingOverlay.show(context);
+        try {
+          final res =
+              await Util.apiPost(context, "/user/CreatePIN", {"PIN": pin});
+          final data = jsonDecode(res.body);
+          LoadingOverlay.hide();
+          if (data["ok"]) {
+            await Util.showNotif(context, "Pin berhasil dibuat", "Success");
+            Navigator.pushNamedAndRemoveUntil(
+                context, "/home", (route) => false);
+          } else {
+            Util.showNotif(context, data["message"], "Failed", isError: true);
+          }
+        } catch (e) {
+          log(e.toString());
+          Util.showNotif(
+              context, "Something went wrong, please try again later", "Failed",
+              isError: true);
+        }
       } else {
         setState(() {
           _isError = true;

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:asamba_android/src/app.dart';
+import 'package:asamba_android/utils/loading_overlay.dart';
 import 'package:asamba_android/utils/util.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -20,16 +21,35 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     initializeFirebase();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   if (mounted) {
-    //     Navigator.of(context).pushNamed('/login');
-    //   }
-    // });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkPin();
+    });
+  }
+
+  void checkPin() async {
+    LoadingOverlay.show(context);
+    try {
+      final data = await Util.apiGetBody(context, '/user/hasPIN');
+      if (data != null) {
+        if (!data["ok"]) {
+          LoadingOverlay.hide();
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/create-pin", (route) => false);
+        }
+      }
+    } catch (e) {
+      log(e.toString());
+      Util.showNotif(
+          context, "Something went wrong, please try again later", "Failed",
+          isError: true);
+    }
+    LoadingOverlay.hide();
   }
 
   Future<void> initializeFirebase() async {
     final fcmToken = await FirebaseMessaging.instance.getToken();
     log('FCM Token: $fcmToken');
+    Util.apiPost(context, "/user/tokenAndroid", {"TokenAndroid": fcmToken});
   }
 
   @override
@@ -89,7 +109,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.of(context).pushNamed('/scan');
         },
         backgroundColor: Theme.of(context).colorScheme.primary,
-        child: Icon(Icons.add, size: Util.dynamicSize(32), color: Colors.white),
+        child: Icon(Icons.qr_code_scanner_rounded,
+            size: Util.dynamicSize(32), color: Colors.white),
       ),
       body: LiquidPullToRefresh(
         onRefresh: refreshData,
@@ -110,14 +131,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       CircleAvatar(
                         radius: 24,
-                        backgroundImage: AssetImage('assets/images/avatar.png'),
+                        backgroundImage: NetworkImage(Util.getURL() +
+                            "/user/Profile?UserName=" +
+                            Util.getStringPreference(prefUsername)),
                       ),
                       SizedBox(width: Util.dynamicSize(10)),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Hi, Wikun Kertanegara",
+                            "Hi, " + Util.getStringPreference(prefName),
                             style: GoogleFonts.poppins(
                               fontSize: Util.dynamicSize(16),
                               fontWeight: FontWeight.w500,
@@ -125,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           Text(
-                            "Pembeli",
+                            "Welcome back",
                             style: GoogleFonts.poppins(
                               fontSize: Util.dynamicSize(13),
                               color: Theme.of(context)

@@ -10,6 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 String prefToken = "token";
+String prefName = "name";
+String prefUsername = "username";
+String prefRole = "role";
+String prefRoleName = "roleName";
 
 const int widthConst = 360;
 const int heightConst = 800;

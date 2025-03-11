@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:developer';
 
+import 'package:asamba_android/utils/loading_overlay.dart';
 import 'package:asamba_android/utils/util.dart';
 import 'package:flutter/material.dart';
 
@@ -17,12 +19,37 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _passwordVisible = false;
 
-  void login() {
+  void login() async {
     String username = usernameController.text;
     String password = passwordController.text;
 
-    log('Username: $username, Password: $password');
-    Navigator.pushNamed(context, "/create-pin");
+    LoadingOverlay.show(context);
+
+    try {
+      final body = {'UserName': username, 'Password': password};
+
+      final response = await Util.apiPost(context, '/user/login', body);
+      log(response.body);
+      final resBody = jsonDecode(response.body);
+      if (resBody['ok'] == true) {
+        final data = resBody['data'];
+        Util.putStringPreference(prefName, data['Name']);
+        Util.putStringPreference(prefToken, data['accessToken']);
+        Util.putStringPreference(prefUsername, data['UserName']);
+        Util.putStringPreference(prefRole, data['RoleID'].toString());
+        // Util.putStringPreference(prefRoleName, data['RoleName'].toString());
+        Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
+      } else {
+        Util.showNotif(context, resBody['message'], "Failed", isError: true);
+      }
+    } catch (e) {
+      log(e.toString());
+      Util.showNotif(context, "No internet connection", "Failed",
+          isError: true);
+    }
+    LoadingOverlay.hide();
+    // log('Username: $username, Password: $password');
+    // Navigator.pushNamed(context, "/create-pin");
     // Navigator.pushReplacementNamed(context, "/create-pin");
   }
 
