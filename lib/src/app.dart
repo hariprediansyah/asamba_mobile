@@ -2,8 +2,12 @@ import 'package:asamba_android/src/login_screen.dart';
 import 'package:asamba_android/src/home_screen.dart';
 import 'package:asamba_android/src/payment_input_screen.dart';
 import 'package:asamba_android/src/pin/create_pin_screen.dart';
+import 'package:asamba_android/src/pin/input_pin_screen.dart';
+import 'package:asamba_android/src/profile_screen.dart';
 import 'package:asamba_android/src/result_screen.dart';
 import 'package:asamba_android/src/scan_qr_screen.dart';
+import 'package:asamba_android/src/show_qr_screen.dart';
+import 'package:asamba_android/src/transaction_history_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -137,6 +141,16 @@ class MyApp extends StatelessWidget {
                     return PaymentInputScreen();
                   case "/payment-success":
                     return ResultScreen();
+                  case "/history":
+                    return TransactionHistoryScreen();
+                  case "/result":
+                    return ResultScreen();
+                  case "/input-pin":
+                    return InputPinScreen();
+                  case "/profile":
+                    return ProfileScreen();
+                  case "/show-qr":
+                    return ShowQrScreen();
                   default:
                     return const LoginScreen();
                 }

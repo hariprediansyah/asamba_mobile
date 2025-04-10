@@ -4,6 +4,8 @@ import 'dart:developer';
 import 'package:asamba_android/utils/loading_overlay.dart';
 import 'package:asamba_android/utils/util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,6 +16,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final LocalAuthentication auth = LocalAuthentication();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -23,6 +26,10 @@ class _LoginScreenState extends State<LoginScreen> {
     String username = usernameController.text;
     String password = passwordController.text;
 
+    loginNow(username, password);
+  }
+
+  void loginNow(username, password) async {
     LoadingOverlay.show(context);
 
     try {
@@ -37,7 +44,9 @@ class _LoginScreenState extends State<LoginScreen> {
         Util.putStringPreference(prefToken, data['accessToken']);
         Util.putStringPreference(prefUsername, data['UserName']);
         Util.putStringPreference(prefRole, data['RoleID'].toString());
-        // Util.putStringPreference(prefRoleName, data['RoleName'].toString());
+        Util.putStringPreference(prefRoleName, data['RoleName'].toString());
+        Util.putStringPreference(prefPassword, password);
+        Util.putStringPreference(prefExpired, data['expiredToken'].toString());
         Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
       } else {
         Util.showNotif(context, resBody['message'], "Failed", isError: true);
@@ -48,9 +57,62 @@ class _LoginScreenState extends State<LoginScreen> {
           isError: true);
     }
     LoadingOverlay.hide();
-    // log('Username: $username, Password: $password');
-    // Navigator.pushNamed(context, "/create-pin");
-    // Navigator.pushReplacementNamed(context, "/create-pin");
+  }
+
+  Future<void> _checkBiometrics() async {
+    log("masuk 1");
+    String? expiredTokenDate = Util.getStringPreference(prefExpired);
+    log(expiredTokenDate);
+    // return;
+    if (expiredTokenDate != "" && expiredTokenDate != "null") {
+      log("masuk 2");
+      var expDate =
+          DateTime.fromMillisecondsSinceEpoch(int.parse(expiredTokenDate!));
+      log(expDate.toString());
+      if (DateTime.now().isAfter(expDate)) {
+        log("masuk");
+        Util.putStringPreference(prefExpired, "");
+        return;
+      }
+    } else {
+      return;
+    }
+    bool canCheckBiometrics;
+    try {
+      log("masuk 3");
+      canCheckBiometrics = await auth.canCheckBiometrics;
+      log(canCheckBiometrics.toString());
+      if (canCheckBiometrics) {
+        bool authenticated = false;
+        log("masuk 4");
+        authenticated = await auth.authenticate(
+          localizedReason: 'Pakai fingerprint atau kamera untuk login',
+          options: const AuthenticationOptions(
+            biometricOnly: true,
+            useErrorDialogs: true,
+            stickyAuth: true,
+          ),
+        );
+        log("masuk biometrik");
+        if (!mounted) return;
+
+        if (authenticated) {
+          loginNow(Util.getStringPreference(prefUsername),
+              Util.getStringPreference(prefPassword));
+        }
+      }
+    } on PlatformException catch (e) {
+      canCheckBiometrics = false;
+      print(e);
+    }
+
+    if (!mounted) return;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometrics();
   }
 
   @override

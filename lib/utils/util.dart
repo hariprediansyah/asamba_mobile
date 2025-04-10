@@ -10,8 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 String prefToken = "token";
+String prefExpired = "expired";
 String prefName = "name";
 String prefUsername = "username";
+String prefPassword = "password";
 String prefRole = "role";
 String prefRoleName = "roleName";
 
@@ -24,7 +26,8 @@ class Util {
   static SharedPreferences? preferences;
 
   static getURL() {
-    return "https://7xb33xt1-5960.asse.devtunnels.ms";
+    // return "https://7xb33xt1-5960.asse.devtunnels.ms";
+    return "https://api.asambacoin.com";
   }
 
   static String getToken() {
@@ -118,7 +121,8 @@ class Util {
     return response;
   }
 
-  static Future<dynamic> apiGetHit(BuildContext context, String url) async {
+  static Future<http.Response?> apiGetHit(
+      BuildContext context, String url) async {
     log(url);
     try {
       final response = await http.get(Uri.parse(Util.getURL() + url), headers: {
@@ -136,8 +140,7 @@ class Util {
 
       if (response.statusCode != 200) {
         // LoadingOverlay.hide();
-        showNotif(context, response.body, "Failed", isError: true);
-        print(response.body);
+        // showNotif(context, response.body, "Failed", isError: true);
         return null;
       } else {
         return response;
@@ -208,19 +211,19 @@ class Util {
       } else {
         var data = jsonDecode(response.body);
         log(data.toString());
-        if (data['Ok'] == true) {
-          return data['Data'];
+        if (data['ok'] == true) {
+          return data['data'];
         } else {
           // showAnimatedToast(context, data['Message'].toString(), isError: true);
-          showNotif(context, data['Message'].toString(), "Failed",
+          showNotif(context, data['message'].toString(), "Failed",
               isError: true);
           // LoadingOverlay.hide();
-          log(data['Message'].toString());
+          log(data['message'].toString());
           return null;
         }
       }
     } catch (e) {
-      print(e);
+      log(e.toString());
       return null;
     }
   }

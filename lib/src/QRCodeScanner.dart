@@ -68,7 +68,8 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
             top: 40,
             left: 16,
             child: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white),
+              icon: Icon(Icons.arrow_back,
+                  color: Theme.of(context).colorScheme.surface),
               onPressed: () => Navigator.pop(context),
             ),
           ),

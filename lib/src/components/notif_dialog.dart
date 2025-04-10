@@ -62,7 +62,7 @@ class NotifDialog extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isError
                       ? Color.fromARGB(255, 227, 26, 28)
-                      : Color.fromARGB(255, 39, 58, 150),
+                      : Theme.of(context).primaryColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),

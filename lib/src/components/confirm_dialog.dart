@@ -6,9 +6,9 @@ class ConfirmDialog extends StatelessWidget {
   ConfirmDialog(
       {super.key,
       required this.message,
-      this.title = "Konfirmasi",
+      this.title = "Confirm",
       this.okButton = "Ok",
-      this.cancelButton = "Kembali"});
+      this.cancelButton = "Back"});
   String title;
   final String message;
   String okButton;
@@ -20,7 +20,7 @@ class ConfirmDialog extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(Util.dynamicSize(16)),
         decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(Util.dynamicSize(12))),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -35,7 +35,7 @@ class ConfirmDialog extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: Util.dynamicSize(18),
                 fontWeight: FontWeight.w600,
-                color: Color.fromARGB(255, 16, 24, 40),
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             SizedBox(height: Util.dynamicSize(8)),
@@ -45,7 +45,7 @@ class ConfirmDialog extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: Util.dynamicSize(14),
                 fontWeight: FontWeight.w400,
-                color: Color.fromARGB(255, 16, 24, 40),
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             SizedBox(height: Util.dynamicSize(24)),
@@ -57,7 +57,7 @@ class ConfirmDialog extends StatelessWidget {
                   Navigator.pop(context, true);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 39, 58, 150),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -89,7 +89,7 @@ class ConfirmDialog extends StatelessWidget {
                   cancelButton,
                   style: GoogleFonts.poppins(
                     fontSize: Util.dynamicSize(14),
-                    color: Color.fromARGB(255, 51, 65, 85),
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w400,
                   ),
                 ),

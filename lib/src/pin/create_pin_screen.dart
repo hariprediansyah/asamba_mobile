@@ -6,6 +6,7 @@ import 'package:asamba_android/utils/loading_overlay.dart';
 import 'package:asamba_android/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart';
 import 'package:pinput/pinput.dart';
 
 class CreatePinScreen extends StatefulWidget {
@@ -18,6 +19,30 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
   bool _isError = false;
   String savedPin = '';
   final TextEditingController _pinController = TextEditingController();
+  Uint8List? profileImageBytes;
+
+  void loadGambar(String username) async {
+    final Response? res =
+        await Util.apiGetHit(context, "/user/Profile?UserName=" + username);
+
+    if (res != null && res.statusCode == 200) {
+      if (res.headers['content-type'] == 'image/png') {
+        final Uint8List bytes = Uint8List.fromList(res.bodyBytes);
+
+        setState(() {
+          profileImageBytes = bytes;
+        });
+      } else {
+        log('Failed to decode image: Unsupported content type');
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadGambar(Util.getStringPreference(prefUsername));
+  }
 
   void _onPinCompleted(String pin) async {
     if (!_isConfirm) {
@@ -115,12 +140,14 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundImage: AssetImage(
-                      'assets/images/avatar.png'), // Ganti dengan gambar profil
+                  backgroundImage: profileImageBytes != null
+                      ? MemoryImage(profileImageBytes!)
+                      : AssetImage(
+                          'assets/images/avatar.png'), // Ganti dengan gambar profil
                 ),
                 SizedBox(height: Util.dynamicSize(16)),
                 Text(
-                  "Hello, Wikun",
+                  "Hello, " + Util.getStringPreference(prefName),
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 SizedBox(height: Util.dynamicSize(8)),

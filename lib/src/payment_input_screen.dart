@@ -1,7 +1,11 @@
+import 'dart:developer';
+import 'dart:typed_data';
+
 import 'package:asamba_android/src/app.dart';
 import 'package:asamba_android/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 class PaymentInputScreen extends StatefulWidget {
@@ -12,11 +16,30 @@ class PaymentInputScreen extends StatefulWidget {
 class _PaymentInputScreenState extends State<PaymentInputScreen> {
   final TextEditingController amountController = TextEditingController();
   final NumberFormat currencyFormat = NumberFormat("#,###", "id_ID");
+  String? _name;
+  Uint8List? profileImageBytes;
 
   @override
   void initState() {
     super.initState();
-    amountController.text = "Rp 0";
+    amountController.text = "0";
+  }
+
+  void loadGambar(String username) async {
+    final Response? res =
+        await Util.apiGetHit(context, "/user/Profile?UserName=" + username);
+
+    if (res != null && res.statusCode == 200) {
+      if (res.headers['content-type'] == 'image/png') {
+        final Uint8List bytes = Uint8List.fromList(res.bodyBytes);
+
+        setState(() {
+          profileImageBytes = bytes;
+        });
+      } else {
+        log('Failed to decode image: Unsupported content type');
+      }
+    }
   }
 
   @override
@@ -24,6 +47,16 @@ class _PaymentInputScreenState extends State<PaymentInputScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     Util.setScreenSize(screenWidth, screenHeight);
+
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+    if (args != null) {
+      _name = args["Name"];
+      if (profileImageBytes == null) {
+        loadGambar(args["UserName"]);
+      }
+    }
 
     CustomColors customColors = Theme.of(context).extension<CustomColors>()!;
 
@@ -85,8 +118,12 @@ class _PaymentInputScreenState extends State<PaymentInputScreen> {
       );
     }
 
-    void transfer() {
-      Navigator.pushNamed(context, "/payment-success");
+    void transfer() async {
+      Navigator.pushNamed(context, "/input-pin", arguments: {
+        "amount": amountController.text.replaceAll(RegExp(r'[^0-9]'), ""),
+        "name": _name,
+        "idHash": args["idHash"]
+      });
     }
 
     return Scaffold(
@@ -121,11 +158,13 @@ class _PaymentInputScreenState extends State<PaymentInputScreen> {
             SizedBox(height: Util.dynamicSize(20)),
             CircleAvatar(
               radius: 40,
-              backgroundImage: AssetImage('assets/images/avatar.png'),
+              backgroundImage: profileImageBytes != null
+                  ? MemoryImage(profileImageBytes!)
+                  : AssetImage('assets/images/avatar.png'),
             ),
             SizedBox(height: Util.dynamicSize(16)),
             Text(
-              "Tukang ayam goreng",
+              _name ?? "Penjual",
               style: GoogleFonts.poppins(
                   fontSize: 16, fontWeight: FontWeight.w500),
             ),
