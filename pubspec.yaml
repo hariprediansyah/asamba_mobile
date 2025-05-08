@@ -47,3 +47,9 @@ flutter:
     # Add assets from the images directory to the application.
     - assets/images/
     - assets/lottie/
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: 'assets/images/logo.png'
+  remove_alpha_ios: true
