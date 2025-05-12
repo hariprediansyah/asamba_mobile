@@ -31,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
     initializeFirebase();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       LoadingOverlay.show(context);
-      FirebaseMessaging.instance.requestPermission();
       loadData();
     });
   }
@@ -95,6 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> initializeFirebase() async {
+    FirebaseMessaging.instance.requestPermission();
     final fcmToken = await FirebaseMessaging.instance.getToken();
     log('FCM Token: $fcmToken');
     Util.apiPost(context, "/user/tokenAndroid", {"TokenAndroid": fcmToken});
@@ -247,7 +247,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () async {
                     final ok = await Util.Confirm(context, "Logout?");
                     if (ok) {
-                      // Util.putStringPreference(prefToken, "");
+                      Util.putStringPreference(prefToken, "");
+                      Util.putStringPreference(prefExpired, "");
                       Navigator.pushNamedAndRemoveUntil(
                           context, "/login", (route) => false);
                     }
