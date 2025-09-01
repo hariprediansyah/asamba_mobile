@@ -27,7 +27,7 @@ class Util {
 
   static getURL() {
     // return "https://7xb33xt1-5960.asse.devtunnels.ms";
-    return "https://api.asambacoin.com";
+    return "https://api.asamba.id";
   }
 
   static String getToken() {
