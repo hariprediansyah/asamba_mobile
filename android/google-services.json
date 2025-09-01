@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:31732078664:android:9e5369b8ff64c2e497e07d",
+        "android_client_info": {
+          "package_name": "com.asamba.coin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCB56N6TixdfBmrSzRGxMXsvCQmHi41nmc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:31732078664:android:09812b8e651e3acb97e07d",
         "android_client_info": {
           "package_name": "com.hariprd.asamba"

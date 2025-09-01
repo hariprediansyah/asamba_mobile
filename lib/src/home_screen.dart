@@ -247,7 +247,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () async {
                     final ok = await Util.Confirm(context, "Logout?");
                     if (ok) {
-                      // Util.putStringPreference(prefToken, "");
+                      Util.putStringPreference(prefToken, "");
+                      Util.putStringPreference(prefExpired, "");
                       Navigator.pushNamedAndRemoveUntil(
                           context, "/login", (route) => false);
                     }
